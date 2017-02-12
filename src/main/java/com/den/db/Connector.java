@@ -12,7 +12,7 @@ public class Connector {
     public void connect(){
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:db.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:crawler.db");
             statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
         } catch (SQLException e) {

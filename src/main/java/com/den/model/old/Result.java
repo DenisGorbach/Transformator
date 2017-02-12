@@ -1,4 +1,4 @@
-package com.den.model;
+package com.den.model.old;
 
 import java.util.List;
 
