@@ -4,12 +4,12 @@
 
 <hibernate-configuration>
     <session-factory>
-        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL81Dialect</property>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">root</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/analyzator</property>
-
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/converted</property>
+        <property name="hibernate.connection.CharSet">utf8</property>
         <property name="connection_pool_size">1</property>
 
         <property name="hbm2ddl.auto">create</property>
@@ -22,6 +22,8 @@
         <mapping class="com.den.model.VkUser"/>
         <mapping class="com.den.model.UniversityInformation"/>
         <mapping class="com.den.model.VkUniversity"/>
+        <mapping class="com.den.model.VkCareer"/>
+        <mapping class="com.den.model.CareerInformation"/>
 
     </session-factory>
 </hibernate-configuration>

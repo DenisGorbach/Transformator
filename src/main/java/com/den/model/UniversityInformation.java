@@ -3,28 +3,28 @@ package com.den.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "universityInformation")
+@Table(name = "university_information")
 public class UniversityInformation extends Model {
 
     @ManyToOne
-    @JoinColumn(name = "id_university")
+    @JoinColumn(name = "university_id")
     private VkUniversity university;
 
     @ManyToOne
-    @JoinColumn(name = "id_student")
+    @JoinColumn(name = "user_id")
     private VkUser vkUser;
 
     @Column
     private Integer faculty;
 
-    @Column
-    private String faculty_name;
+    @Column(name = "faculty_name")
+    private String facultyName;
 
     @Column
     private Integer chair;
 
-    @Column
-    private String chair_name;
+    @Column(name = "chair_name")
+    private String chairName;
 
     @Column
     private Integer graduation;
@@ -64,20 +64,20 @@ public class UniversityInformation extends Model {
         this.chair = chair;
     }
 
-    public String getFaculty_name() {
-        return faculty_name;
+    public String getFacultyName() {
+        return facultyName;
     }
 
-    public void setFaculty_name(String faculty_name) {
-        this.faculty_name = faculty_name;
+    public void setFacultyName(String faculty_name) {
+        this.facultyName = faculty_name;
     }
 
-    public String getChair_name() {
-        return chair_name;
+    public String getChairName() {
+        return chairName;
     }
 
-    public void setChair_name(String chair_name) {
-        this.chair_name = chair_name;
+    public void setChairName(String chairName) {
+        this.chairName = chairName;
     }
 
     public Integer getGraduation() {
@@ -93,9 +93,9 @@ public class UniversityInformation extends Model {
         return "UniversityInformation{" +
                 "university=" + university +
                 ", faculty=" + faculty +
-                ", faculty_name='" + faculty_name + '\'' +
+                ", faculty_name='" + facultyName + '\'' +
                 ", chair=" + chair +
-                ", chair_name='" + chair_name + '\'' +
+                ", chair_name='" + chairName + '\'' +
                 ", graduation=" + graduation +
                 '}';
     }

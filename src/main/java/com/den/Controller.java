@@ -1,18 +1,11 @@
 package com.den;
 
 
-import com.den.dao.UniversityInformationDao;
-import com.den.dao.VkUniversityDao;
-import com.den.dao.VkUserDao;
-import com.den.dao.impl.UniversityInformationDaoImpl;
-import com.den.dao.impl.VkUniversityDaoImpl;
-import com.den.dao.impl.VkUserDaoImpl;
+import com.den.dao.*;
+import com.den.dao.impl.*;
 import com.den.db.HiveConnector;
 import com.den.db.PostgresConnector;
-import com.den.model.UniversityInformation;
-import com.den.model.VkJob;
-import com.den.model.VkUniversity;
-import com.den.model.VkUser;
+import com.den.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,14 +19,15 @@ import java.util.*;
 public class Controller {
 
     private HiveConnector hiveConnector;
+    ObjectMapper mapper;
 
-    public List<Integer> getIdResultList() {
+    private List<Integer> getIdResultList() {
 
         List<Integer> listOfId = new ArrayList<Integer>();
         try {
             PostgresConnector connector = new PostgresConnector();
             connector.connect();
-            ResultSet rs = connector.getResultSet("Select id from \"Unsorted\";");
+            ResultSet rs = connector.getResultSet("Select id from \"unsort\";");
             while (rs.next()) {
                 listOfId.add(rs.getInt("id"));
             }
@@ -44,20 +38,20 @@ public class Controller {
     }
 
 
-    public void convert() throws SQLException, IOException {
+    private void convert() throws SQLException, IOException {
         PostgresConnector postgresConnector = new PostgresConnector();
         postgresConnector.connect();
 
-        hiveConnector = new HiveConnector();
-        hiveConnector.connect();
-        hiveConnector.executeQuery("CREATE TABLE IF NOT EXISTS vkuser (uid int, b_date String, city String, country String, first_name String, last_name String)");
+//        hiveConnector = new HiveConnector();
+//        hiveConnector.connect();
+//        hiveConnector.executeQuery("CREATE TABLE IF NOT EXISTS vkuser (uid int, b_date String, city String, country String, first_name String, last_name String)");
 
-        ObjectMapper mapper = new ObjectMapper();
+        mapper = new ObjectMapper();
         List<Integer> listOfId = getIdResultList();
 
-//        for (Integer aListOfId : listOfId) {
-        String query = "Select \"response\" from \"Unsorted\" where id = 1";
-//            String query = "Select \"response\" from \"Unsorted\" where id = " + aListOfId;
+        for (Integer aListOfId : listOfId) {
+//        String query = "Select \"response\" from \"unsort\" where id = 1";
+            String query = "Select \"response\" from \"unsort\" where id = " + aListOfId;
         ResultSet rs = postgresConnector.getResultSet(query);
         ObjectNode jsonObject = null;
         while (rs.next()) {
@@ -76,63 +70,85 @@ public class Controller {
             VkUserDao vkUserDao = new VkUserDaoImpl();
             VkUniversityDao vkUniversityDao = new VkUniversityDaoImpl();
             UniversityInformationDao universityInformationDao = new UniversityInformationDaoImpl();
-
+            VkCareerDao vkCareerDao = new VkCareerDaoImpl();
+            CareerInformationDao careerInformationDao = new CareerInformationDaoImpl();
             ArrayList<Integer> universityIdList = vkUniversityDao.getListOfIdOfUniversities();
 
-            ArrayList<VkUser> vkUsers = new ArrayList<VkUser>();
+            ArrayList<VkUser> vkUsers = new ArrayList<>();
             VkUser vkUser;
             UniversityInformation universityInformation = null;
             VkUniversity vkUniversity = null;
             ArrayNode universities;
 
+            VkCareer career = null;
+            CareerInformation careerInformation = null;
+            ArrayNode careers;
+
 //                for (int i = 0; i < currentArrayNode.size(); i++) {
             for (int i = 0; i < currentArrayNode.size(); i++) {
                 vkUser = setBasicFieldsForVkUser(currentArrayNode.get(i));
-//                    vkUserDao.add(vkUser);
-                    /*
-                    universities = mapper.readValue(String.valueOf(currentArrayNode.get(i).get("universities")), ArrayNode.class);
+//                vkUser = mapper.readValue(currentArrayNode.get(i).toString(), VkUser.class);
+                vkUserDao.add(vkUser);
 
-                    if (universities != null) {
-                        if (universities.size() != 0) {
-                            for (int j = 0; j < universities.size(); j++) {
-                                int vkUniversityId = universities.get(j).get("id").asInt();
-                                if (universityIdList.contains(vkUniversityId)) {
-                                    vkUniversity = vkUniversityDao.getByVkId(vkUniversityId);
-                                } else {
-                                    vkUniversity = setFieldsForUniversity(universities.get(j));
-//                                    vkUniversityDao.add(vkUniversity);
-                                    universityIdList.add(vkUniversityId);
-                                }
+                universities = mapper.readValue(String.valueOf(currentArrayNode.get(i).get("universities")), ArrayNode.class);
+                careers = mapper.readValue(String.valueOf(currentArrayNode.get(i).get("career")), ArrayNode.class);
 
-                                universityInformation = setFieldsForUniversityInformation(universities.get(j));
-                                universityInformation.setUniversity(vkUniversity);
-                                universityInformation.setVkUser(vkUser);
-//                                universityInformationDao.add(universityInformation);
+                if (universities != null) {
+                    if (universities.size() != 0) {
+                        for (int j = 0; j < universities.size(); j++) {
+                            int vkUniversityId = universities.get(j).get("id").asInt();
+                            if (universityIdList.contains(vkUniversityId)) {
+                                vkUniversity = vkUniversityDao.getByVkId(vkUniversityId);
+                            } else {
+                                vkUniversity = setFieldsForUniversity(universities.get(j));
+                                vkUniversityDao.add(vkUniversity);
+                                universityIdList.add(vkUniversityId);
                             }
+
+
+                            universityInformation = setFieldsForUniversityInformation(universities.get(j));
+                            universityInformation.setUniversity(vkUniversity);
+                            universityInformation.setVkUser(vkUser);
+                            universityInformationDao.add(universityInformation);
                         }
                     }
-*/
+                }
+
+                if (careers != null) {
+                    if (careers.size() != 0) {
+                        for (int j = 0; j < careers.size(); j++) {
+                            career = setFieldsForCareer(careers.get(j));
+                            vkCareerDao.add(career);
+                            careerInformation = setFieldsForCareerInformation(careers.get(j));
+                            careerInformation.setCareer(career);
+                            careerInformation.setUser(vkUser);
+                            careerInformationDao.add(careerInformation);
+                        }
+                    }
+                }
+
                 vkUsers.add(vkUser);
+//                vkUserDao.add(vkUser);
                 System.out.println("Added user");
             }
-            System.out.println("Preparing query for hive");
-            insertIntoHive(vkUsers);
+//            System.out.println("Preparing query for hive");
+//            insertIntoHive(vkUsers);
 
         }
 
-//        }
+        }
         postgresConnector.closeConnection();
     }
 
-    public void insertIntoHive(List<VkUser> userList) {
+    private void insertIntoHive(List<VkUser> userList) {
         String insertQuery = "Insert into vkuser values ";
         String user;
         String b_date;
         String firstName;
         String lastName;
         for (VkUser vkUser : userList) {
-            if (vkUser.getB_date() != null) {
-                b_date = "'" + vkUser.getB_date() + "'";
+            if (vkUser.getBDate() != null) {
+                b_date = "'" + vkUser.getBDate() + "'";
             } else b_date = null;
 
             if (vkUser.getFirst_name() != null) {
@@ -152,13 +168,13 @@ public class Controller {
         hiveConnector.executeQuery(insertQuery);
     }
 
-    public VkUser setBasicFieldsForVkUser(JsonNode userObjectFromJson) {
+    private VkUser setBasicFieldsForVkUser(JsonNode userObjectFromJson) {
         VkUser vkUser = new VkUser();
         vkUser.setUid(userObjectFromJson.get("uid").asInt());
         try {
-            vkUser.setB_date(userObjectFromJson.get("bdate").asText());
+            vkUser.setBDate(userObjectFromJson.get("bdate").asText());
         } catch (NullPointerException e) {
-            vkUser.setB_date(null);
+            vkUser.setBDate(null);
         }
         vkUser.setFirst_name(userObjectFromJson.get("first_name").asText());
         vkUser.setLast_name(userObjectFromJson.get("last_name").asText());
@@ -167,12 +183,12 @@ public class Controller {
         return vkUser;
     }
 
-    public UniversityInformation setFieldsForUniversityInformation(JsonNode universityObjectFromJson) {
+    private UniversityInformation setFieldsForUniversityInformation(JsonNode universityObjectFromJson) {
         UniversityInformation universityInformation = new UniversityInformation();
         try {
-            universityInformation.setFaculty_name(universityObjectFromJson.get("faculty_name").asText());
+            universityInformation.setFacultyName(universityObjectFromJson.get("faculty_name").asText());
         } catch (NullPointerException e) {
-            universityInformation.setFaculty_name(null);
+            universityInformation.setFacultyName(null);
         }
         try {
             universityInformation.setFaculty(universityObjectFromJson.get("faculty").asInt());
@@ -180,9 +196,9 @@ public class Controller {
             universityInformation.setFaculty(null);
         }
         try {
-            universityInformation.setChair_name(universityObjectFromJson.get("chair_name").asText());
+            universityInformation.setChairName(universityObjectFromJson.get("chair_name").asText());
         } catch (NullPointerException e) {
-            universityInformation.setChair_name(null);
+            universityInformation.setChairName(null);
         }
         try {
             universityInformation.setChair(universityObjectFromJson.get("chair").asInt());
@@ -197,28 +213,73 @@ public class Controller {
         return universityInformation;
     }
 
-    public VkUniversity setFieldsForUniversity(JsonNode universityObjectFromJson) {
+    private VkUniversity setFieldsForUniversity(JsonNode universityObjectFromJson) {
         VkUniversity vkUniversity = new VkUniversity();
-        vkUniversity.setIdVkUniversity(universityObjectFromJson.get("id").asInt());
+        vkUniversity.setIdUniversity(universityObjectFromJson.get("id").asInt());
         vkUniversity.setIdUniversityCity(universityObjectFromJson.get("city").asInt());
-        vkUniversity.setNameVkUniversity(universityObjectFromJson.get("name").asText());
+        vkUniversity.setNameUniversity(universityObjectFromJson.get("name").asText());
         return vkUniversity;
     }
 
-    public VkJob setFieldsForJob(JsonNode jobObjectFromJson) {
-        VkJob vkJob = new VkJob();
+    private VkCareer setFieldsForCareer(JsonNode careerObjectFromJson){
+        VkCareer career = new VkCareer();
+
         try {
-            vkJob.setIdVkJob(jobObjectFromJson.get("id").asLong());
+            career.setCompanyName(careerObjectFromJson.get("company").asText());
         } catch (NullPointerException e) {
-            vkJob.setIdVkJob(0);
+            career.setCompanyName(null);
         }
-        vkJob.setNameVkJob(jobObjectFromJson.get("name").asText());
-        return vkJob;
+
+        try {
+            career.setGroupId(careerObjectFromJson.get("group_id").asInt());
+        } catch (NullPointerException e) {
+            career.setGroupId(null);
+        }
+        return career;
+    }
+
+    private CareerInformation setFieldsForCareerInformation(JsonNode careerInformationObjectFromJson){
+        CareerInformation careerInformation = new CareerInformation();
+        try {
+            careerInformation.setCity(careerInformationObjectFromJson.get("city_id").asInt());
+        } catch (NullPointerException e) {
+            careerInformation.setCity(null);
+        }
+
+        try {
+            careerInformation.setCountry(careerInformationObjectFromJson.get("country_id").asInt());
+        } catch (NullPointerException e) {
+            careerInformation.setCountry(null);
+        }
+
+        try {
+            careerInformation.setFrom(careerInformationObjectFromJson.get("from").asInt());
+        } catch (NullPointerException e) {
+            careerInformation.setFrom(null);
+        }
+
+        try {
+            careerInformation.setUntil(careerInformationObjectFromJson.get("until").asInt());
+        } catch (NullPointerException e) {
+            careerInformation.setUntil(null);
+        }
+
+        try {
+            careerInformation.setPosition(careerInformationObjectFromJson.get("position").asText());
+        } catch (NullPointerException e) {
+            careerInformation.setPosition(null);
+        }
+
+        return careerInformation;
     }
 
     public static void main(String[] args) throws SQLException, IOException {
         Controller transformator = new Controller();
         transformator.convert();
+//        CareerInformation careerInformation = new CareerInformation();
+//        careerInformation.setFrom(12);
+//        CareerInformationDaoImpl careerInformationDao = new CareerInformationDaoImpl();
+//        careerInformationDao.add(careerInformation);
         System.exit(0);
     }
 }

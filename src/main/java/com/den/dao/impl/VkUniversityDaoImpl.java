@@ -22,7 +22,7 @@ public class VkUniversityDaoImpl extends AbstractDao<VkUniversity> implements Vk
     public ArrayList<Integer> getListOfIdOfUniversities() {
         Criteria criteria = getSession().createCriteria(clazz);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        criteria.setProjection(Projections.property("idVkUniversity"));
+        criteria.setProjection(Projections.property("idUniversity"));
         ArrayList<Integer> list = (ArrayList<Integer>) criteria.list();
         getSession().close();
         return list;
@@ -33,7 +33,7 @@ public class VkUniversityDaoImpl extends AbstractDao<VkUniversity> implements Vk
         s.beginTransaction();
         Criteria criteria = s.createCriteria(clazz);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        criteria.add(Restrictions.eq("idVkUniversity", id));
+        criteria.add(Restrictions.eq("idUniversity", id));
         VkUniversity vkUniversity = (VkUniversity) criteria.uniqueResult();
         s.close();
         return vkUniversity;

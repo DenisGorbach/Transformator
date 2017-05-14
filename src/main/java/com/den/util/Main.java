@@ -18,16 +18,16 @@ public class Main {
         UniversityInformationDao universityInformationDao = new UniversityInformationDaoImpl();
 
         VkUniversity university = new VkUniversity();
-        university.setIdVkUniversity(1111);
+        university.setIdUniversity(1111);
         university.setIdUniversityCity(2222);
-        university.setNameVkUniversity("ONPU");
+        university.setNameUniversity("ONPU");
         vkUniversityDao.add(university);
 
         VkUser vkUser = new VkUser();
         vkUser.setUid(11111);
         vkUser.setCountry(1);
         vkUser.setCity(1);
-        vkUser.setB_date("123");
+        vkUser.setBDate("123");
         vkUser.setFirst_name("First name");
         vkUser.setLast_name("Last name");
         vkUserDao.add(vkUser);
@@ -35,9 +35,9 @@ public class Main {
         UniversityInformation universityInformation = new UniversityInformation();
         universityInformation.setUniversity(university);
         universityInformation.setChair(11111);
-        universityInformation.setChair_name("chair_name");
+        universityInformation.setChairName("chair_name");
         universityInformation.setFaculty(1111);
-        universityInformation.setFaculty_name("Name");
+        universityInformation.setFacultyName("Name");
         universityInformation.setGraduation(2020);
         universityInformation.setVkUser(vkUser);
         universityInformationDao.add(universityInformation);

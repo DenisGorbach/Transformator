@@ -2,7 +2,7 @@ package com.den.db;
 
 import java.sql.*;
 
-public class PostgresConnector {
+public class MysqlConnector {
 
     private Connection connection = null;
     private Statement statement;
@@ -11,7 +11,7 @@ public class PostgresConnector {
     public void connect(){
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/crawler", "root", "root");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/crawler", "postgres", "root");
             statement = connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,7 +56,7 @@ public class PostgresConnector {
 
 //        String query = "Insert into \"University\"(vkId, name, city) values(123123, 'ONPU', 'Odessa');";
 //        connector.executeQuery(query);
-        String query = "Select * from \"unsort\";";
+        String query = "Select * from \"Unsorted\";";
         ResultSet resultSet = connector.getResultSet(query);
         try {
             while (resultSet.next()){

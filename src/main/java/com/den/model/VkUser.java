@@ -5,16 +5,16 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "vkUser")
+@Table(name = "vk_user")
 public class VkUser extends Model {
 
     @Column
     private int uid;
 
-    @Column
+    @Column(name = "first_name")
     private String first_name;
 
-    @Column
+    @Column(name = "last_name")
     private String last_name;
 
     @Column
@@ -27,7 +27,7 @@ public class VkUser extends Model {
     private String b_date;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "vkUser")
-    private Set<UniversityInformation> universityInformations;
+    private Set<UniversityInformation> universityInfoSet;
 
     public VkUser() {
     }
@@ -72,20 +72,20 @@ public class VkUser extends Model {
         this.country = country;
     }
 
-    public String getB_date() {
+    public String getBDate() {
         return b_date;
     }
 
-    public void setB_date(String b_date) {
+    public void setBDate(String b_date) {
         this.b_date = b_date;
     }
 
-    public Set<UniversityInformation> getUniversityInformations() {
-        return universityInformations;
+    public Set<UniversityInformation> getUniversityInfoSet() {
+        return universityInfoSet;
     }
 
-    public void setUniversityInformations(Set<UniversityInformation> universityInformations) {
-        this.universityInformations = universityInformations;
+    public void setUniversityInfoSet(Set<UniversityInformation> universityInformations) {
+        this.universityInfoSet = universityInformations;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class VkUser extends Model {
                 ", city=" + city +
                 ", country=" + country +
                 ", b_date='" + b_date + '\'' +
-                ", universityInformations=" + universityInformations +
+                ", universityInformations=" + universityInfoSet +
                 '}';
     }
 }

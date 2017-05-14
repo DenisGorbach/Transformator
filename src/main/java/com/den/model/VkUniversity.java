@@ -1,22 +1,19 @@
 package com.den.model;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
-@Table(name = "VkUniversity")
+@Table(name = "vk_university")
 public class VkUniversity extends Model {
 
-    @Column
-    private int idVkUniversity;
-    @Column
-    private String nameVkUniversity;
-    @Column
+    @Column(name = "university_id")
+    private int idUniversity;
+
+    @Column(name = "university_name")
+    private String nameUniversity;
+
+    @Column(name = "university_city_id")
     private long idUniversityCity;
-
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "university")
-//    private Set<UniversityInformationDao> universityInformationSet;
-
 
     public VkUniversity() {
     }
@@ -29,27 +26,27 @@ public class VkUniversity extends Model {
         this.idUniversityCity = idUniversityCity;
     }
 
-    public int getIdVkUniversity() {
-        return idVkUniversity;
+    public int getIdUniversity() {
+        return idUniversity;
     }
 
-    public void setIdVkUniversity(int idVkUniversity) {
-        this.idVkUniversity = idVkUniversity;
+    public void setIdUniversity(int idVkUniversity) {
+        this.idUniversity = idVkUniversity;
     }
 
-    public String getNameVkUniversity() {
-        return nameVkUniversity;
+    public String getNameUniversity() {
+        return nameUniversity;
     }
 
-    public void setNameVkUniversity(String nameVkUniversity) {
-        this.nameVkUniversity = nameVkUniversity;
+    public void setNameUniversity(String nameVkUniversity) {
+        this.nameUniversity = nameVkUniversity;
     }
 
     @Override
     public String toString() {
         return "VkUniversity{" +
-                "idVkUniversity=" + idVkUniversity +
-                ", nameVkUniversity='" + nameVkUniversity + '\'' +
+                "idUniversity=" + idUniversity +
+                ", nameUniversity='" + nameUniversity + '\'' +
                 ", idUniversityCity=" + idUniversityCity +
                 '}';
     }
