@@ -32,8 +32,7 @@ public class Controller {
                 listOfId.add(rs.getInt("id"));
             }
             connector.closeConnection();
-        } catch (SQLException e) {
-        }
+        } catch (SQLException ignored) {}
         return listOfId;
     }
 
@@ -42,6 +41,15 @@ public class Controller {
         PostgresConnector postgresConnector = new PostgresConnector();
         postgresConnector.connect();
 
+        //DAO
+        VkUserDao vkUserDao = new VkUserDaoImpl();
+        VkUniversityDao vkUniversityDao = new VkUniversityDaoImpl();
+        UniversityInformationDao universityInformationDao = new UniversityInformationDaoImpl();
+        VkCareerDao vkCareerDao = new VkCareerDaoImpl();
+        CareerInformationDao careerInformationDao = new CareerInformationDaoImpl();
+        ArrayList<Integer> universityIdList = vkUniversityDao.getListOfIdOfUniversities();
+        ArrayList<String> careersNames = vkCareerDao.getListOfGroupsName();
+        ArrayList<Integer> careersGroupIds = vkCareerDao.getListOfGroupsId();
 //        hiveConnector = new HiveConnector();
 //        hiveConnector.connect();
 //        hiveConnector.executeQuery("CREATE TABLE IF NOT EXISTS vkuser (uid int, b_date String, city String, country String, first_name String, last_name String)");
@@ -60,34 +68,25 @@ public class Controller {
         //there is an array of unsorted users
         ArrayNode arrayNode = mapper.readValue(String.valueOf(jsonObject.get("response").get(0).get("response")), ArrayNode.class);
 
-//            for (int n = 0; n < arrayNode.size(); n++) {
         for (int n = 0; n < 1; n++) {
             ArrayNode currentArrayNode = mapper.readValue(String.valueOf(arrayNode.get(n)), ArrayNode.class);
             currentArrayNode.remove(0);
             jsonObject.set("response", currentArrayNode.get(n));
 
-            //DAO
-            VkUserDao vkUserDao = new VkUserDaoImpl();
-            VkUniversityDao vkUniversityDao = new VkUniversityDaoImpl();
-            UniversityInformationDao universityInformationDao = new UniversityInformationDaoImpl();
-            VkCareerDao vkCareerDao = new VkCareerDaoImpl();
-            CareerInformationDao careerInformationDao = new CareerInformationDaoImpl();
-            ArrayList<Integer> universityIdList = vkUniversityDao.getListOfIdOfUniversities();
+
 
             ArrayList<VkUser> vkUsers = new ArrayList<>();
             VkUser vkUser;
-            UniversityInformation universityInformation = null;
-            VkUniversity vkUniversity = null;
+            UniversityInformation universityInformation;
+            VkUniversity vkUniversity;
             ArrayNode universities;
 
-            VkCareer career = null;
-            CareerInformation careerInformation = null;
+            VkCareer career;
+            CareerInformation careerInformation;
             ArrayNode careers;
 
-//                for (int i = 0; i < currentArrayNode.size(); i++) {
             for (int i = 0; i < currentArrayNode.size(); i++) {
                 vkUser = setBasicFieldsForVkUser(currentArrayNode.get(i));
-//                vkUser = mapper.readValue(currentArrayNode.get(i).toString(), VkUser.class);
                 vkUserDao.add(vkUser);
 
                 universities = mapper.readValue(String.valueOf(currentArrayNode.get(i).get("universities")), ArrayNode.class);
@@ -105,7 +104,6 @@ public class Controller {
                                 universityIdList.add(vkUniversityId);
                             }
 
-
                             universityInformation = setFieldsForUniversityInformation(universities.get(j));
                             universityInformation.setUniversity(vkUniversity);
                             universityInformation.setVkUser(vkUser);
@@ -118,7 +116,25 @@ public class Controller {
                     if (careers.size() != 0) {
                         for (int j = 0; j < careers.size(); j++) {
                             career = setFieldsForCareer(careers.get(j));
-                            vkCareerDao.add(career);
+                            System.out.println(career);
+                            if (career.getCompanyName() != null) {
+                                if (careersNames.contains(career.getCompanyName())) {
+                                    career = vkCareerDao.getByCompanyName(career.getCompanyName());
+                                } else {
+                                    vkCareerDao.add(career);
+                                    careersNames.add(career.getCompanyName());
+                                }
+                            }
+
+                            if (career.getGroupId() != null) {
+                                if (careersGroupIds.contains(career.getGroupId())) {
+                                    career = vkCareerDao.getByGroupId(career.getGroupId());
+                                } else {
+                                    vkCareerDao.add(career);
+                                    careersGroupIds.add(career.getGroupId());
+                                }
+                            }
+
                             careerInformation = setFieldsForCareerInformation(careers.get(j));
                             careerInformation.setCareer(career);
                             careerInformation.setUser(vkUser);
@@ -128,12 +144,8 @@ public class Controller {
                 }
 
                 vkUsers.add(vkUser);
-//                vkUserDao.add(vkUser);
                 System.out.println("Added user");
             }
-//            System.out.println("Preparing query for hive");
-//            insertIntoHive(vkUsers);
-
         }
 
         }

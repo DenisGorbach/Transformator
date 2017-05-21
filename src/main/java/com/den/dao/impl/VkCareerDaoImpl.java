@@ -17,28 +17,49 @@ public class VkCareerDaoImpl extends AbstractDao<VkCareer> implements VkCareerDa
     public VkCareerDaoImpl() {
     }
 
+
     @Override
-    public VkCareer getByVkId(int id) {
-        return null;
+    public ArrayList<String> getListOfGroupsName() {
+        Criteria criteria = getSession().createCriteria(clazz);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria.setProjection(Projections.property("companyName"));
+        ArrayList<String> list = (ArrayList<String>) criteria.list();
+        getSession().close();
+        return list;
     }
 
-//    public ArrayList<Integer> getListOfIdOfUniversities() {
-//        Criteria criteria = getSession().createCriteria(clazz);
-//        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-//        criteria.setProjection(Projections.property("idUniversity"));
-//        ArrayList<Integer> list = (ArrayList<Integer>) criteria.list();
-//        getSession().close();
-//        return list;
-//    }
+    @Override
+    public VkCareer getByGroupId(int id) {
+        Session s = getSession();
+        s.beginTransaction();
+        Criteria criteria = s.createCriteria(clazz);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria.add(Restrictions.eq("groupId", id));
+        VkCareer vkCareer = (VkCareer) criteria.uniqueResult();
+        s.close();
+        return vkCareer;
+    }
 
-//    public VkCareer getByVkId(int id) {
-//        Session s = getSession();
-//        s.beginTransaction();
-//        Criteria criteria = s.createCriteria(clazz);
-//        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-//        criteria.add(Restrictions.eq("idUniversity", id));
-//        VkUniversity vkUniversity = (VkUniversity) criteria.uniqueResult();
-//        s.close();
-//        return vkUniversity;
-//    }
+    @Override
+    public VkCareer getByCompanyName(String name) {
+        Session s = getSession();
+        s.beginTransaction();
+        Criteria criteria = s.createCriteria(clazz);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria.add(Restrictions.eq("companyName", name));
+        VkCareer vkCareer = (VkCareer) criteria.uniqueResult();
+        s.close();
+        return vkCareer;
+    }
+
+    @Override
+    public ArrayList<Integer> getListOfGroupsId() {
+        Criteria criteria = getSession().createCriteria(clazz);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria.setProjection(Projections.property("groupId"));
+        ArrayList<Integer> list = (ArrayList<Integer>) criteria.list();
+        getSession().close();
+        return list;
+    }
+
 }

@@ -7,7 +7,13 @@ import java.util.ArrayList;
 
 public interface VkCareerDao extends ModelDao<VkCareer>{
 
-//    ArrayList<Integer> getListOfIdOfUniversities();
+    ArrayList<Integer> getListOfGroupsId();
 
-    VkCareer getByVkId(int id);
+    ArrayList<String> getListOfGroupsName();
+
+    VkCareer getByGroupId(int id);
+
+    VkCareer getByCompanyName(String name);
+
+
 }
